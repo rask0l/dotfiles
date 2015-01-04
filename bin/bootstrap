@@ -1,0 +1,15 @@
+#!/bin/bash
+
+dotfile_root="$HOME/.dotfiles"
+dotfiles=${dotfile_root}"/dotfiles"
+
+
+link () {
+  for src in $(find "$dotfiles" -maxdepth 2 -regextype posix-extended -regex ".*rc|.*config")
+  do
+    dst="$HOME/.$(basename "${src##*/}")"
+    ln -sv "$src" "$dst"
+  done
+}
+
+link
