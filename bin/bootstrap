@@ -17,6 +17,7 @@ install_deps() {
     print -n " already exists."
   } else {
     git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    vim +PluginInstall +qall
   }
 }
 
