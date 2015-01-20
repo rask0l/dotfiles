@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+DEV_DIR=${HOME}/Development
+
+
+
+mkdir -p $DEV_DIR
+
+while getopts cgjprsqvf o
+do  case "$o" in
+    c)
+        mkdir -p ${DEV_DIR}/c
+        ;;
+    g)
+        mkdir -p ${DEV_DIR}/go
+        ;;
+    j)
+        mkdir -p ${DEV_DIR}/java
+        ;;
+    p)
+        mkdir -p ${DEV_DIR}/python
+        ;;
+    r)
+        mkdir -p ${DEV_DIR}/ruby
+        ;;
+    s)
+        mkdir -p ${DEV_DIR}/shell
+        ;;
+    q)
+        mkdir -p ${DEV_DIR}/qt
+        ;;
+    v)
+        mkdir -p ${DEV_DIR}/vagrant
+        apt-get install virtualbox
+        apt-get install vagrant
+        apt-get install virtualbox-dkms        
+        ;;
+    f)
+        mkdir -p ${DEV_DIR}/chef
+        ;;
+    *)    print >&2 "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-s] [-q] [-v] [-c]"
+            print >&2 "-c Make a folder for C & C++ programming."
+            print >&2 "-g Make a folder go programming."
+            print >&2 "-j Make a folder for java programming."
+            print >&2 "-p Make a folder for python programming."
+            print >&2 "-r Make a folder for shell programming."
+            print >&2 "-s Make a folder for qt programming."
+            print >&2 "-v Make a folder for vagrant."
+            print >&2 "-f Make a folder for chef."
+        exit 1;;
+    esac
+done

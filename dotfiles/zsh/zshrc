@@ -6,3 +6,5 @@ antigen theme robbyrussell
 antigen apply
 
 source "$HOME/.dotfiles/bin/sourcefile.zsh"
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
