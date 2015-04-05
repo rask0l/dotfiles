@@ -4,21 +4,12 @@ dotfile_root="$HOME/.dotfiles"
 dotfiles="${dotfile_root}/dotfiles"
 zsh_sourcefile="${dotfile_root}/bin/sourcefile.zsh"
 
-install_deps() {
-  print -n "Installing antigen..."
-  if [[ -d "$HOME/.antigen" ]] {
-    print " already exists."
-  } else {
-    git clone https://github.com/zsh-users/antigen.git ~/.antigen
-  }
+check_installation() {
 
-  print -n "Installing vundle..."
-  if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]] {
-    print -n " already exists."
-  } else {
-    git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    vim +PluginInstall +qall
-  }
+    if [[ ! -d $dotfile_root ]] {
+        print "Dotfiles was not installed correctly.  Be sure to install it in '~/.dotfiles'.  "
+        exit 1
+    }
 }
 
 add_dotfiles() {
@@ -53,6 +44,23 @@ add_dotfiles() {
   done
 }
 
+install_deps() {
+  print -n "Installing antigen..."
+  if [[ -d "$HOME/.antigen" ]] {
+    print " already exists."
+  } else {
+    git clone https://github.com/zsh-users/antigen.git ~/.antigen
+  }
+
+  print -n "Installing vundle..."
+  if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]] {
+    print " already exists."
+  } else {
+    git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    vim +PluginInstall +qall
+  }
+}
+
 generate_sourcefile_zsh() {
   print "Regenerating sourcefile (${zsh_sourcefile})"
   define-heredoc text <<'EOF'
@@ -67,5 +75,6 @@ define-heredoc() {
   IFS='\n' read -r -d '' ${1} || true;
 }
 
+check_installation
 add_dotfiles
 install_deps
