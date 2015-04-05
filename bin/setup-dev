@@ -2,8 +2,10 @@
 
 DEV_DIR=${HOME}/Development
 
+RUBY_VER="2.2.1"
+CHEFDK_VER="0.4.0-1"
 
-
+sudo apt-get update
 mkdir -p $DEV_DIR
 
 while getopts cgjprsqvf o
@@ -13,15 +15,100 @@ do  case "$o" in
         ;;
     g)
         mkdir -p ${DEV_DIR}/go
+
+
+        #get last version of go compiler (e.g. go1.3.3.)
+        #B0009
+        v=`echo $(wget -qO- golang.org) | awk '{ if (match($0,/go([0-9]+.)+/)) print substr($0,RSTART,RLENGTH) }'`
+
+        #exit if no network connection otherwise the rest will fail 
+        #B0003
+        if [ -z "$v" ]; then
+           echo "No network connection"
+           exit
+        fi
+
+        #get host computer arch (e.g. i686|amd64)
+        #B0002,B0007
+        case $(uname -m) in
+        i686 ) a="386";;
+           * ) a="amd64";;
+        esac
+
+        #get kernel name (e.g. linux|freebsd)
+        k=$(uname -s | tr '[:upper:]' '[:lower:]')
+
+        #B0005
+        test -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
+
+        #build compiler name (e.g. go1.3.3.linux-386.tar.gz)
+        n=${v}${k}-${a}.tar.gz
+
+        echo "Download last compiler $n..."
+        #ERROR: certificate common name `*.googleusercontent.com' doesn't match requested host name `storage.googleapis.com'.
+        #To connect to storage.googleapis.com insecurely, use `--no-check-certificate'.
+        #WORKAROUND: old sistems like 10.04 need --no-check-certificate to avoid this error
+        #B0004
+        wget --no-check-certificate -qNP ${XDG_DOWNLOAD_DIR} https://storage.googleapis.com/golang/$n
+        echo "Unpack..."
+        tar -xf ${XDG_DOWNLOAD_DIR}/$n -C $HOME
+
+        echo "Create \$GOPATH"
+        GOPATH=${DEV_DIR}/go
+        mkdir -p $GOPATH/src
+
         ;;
     j)
         mkdir -p ${DEV_DIR}/java
+        sudo add-apt-repository ppa:webupd8team/java
+        sudo apt-get update
+        #sudo apt-get install oracle-java8-installer
+        echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+        sudo apt-get install oracle-java8-set-default
         ;;
     p)
         mkdir -p ${DEV_DIR}/python
         ;;
     r)
         mkdir -p ${DEV_DIR}/ruby
+
+        print -n "r[v]m or r[b]env? (v/b): "
+        read type
+
+        if [[ $type == "b" ]]
+        then
+
+            sudo apt-get install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev
+
+            cd
+            git clone git://github.com/sstephenson/rbenv.git .rbenv
+            echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+            echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+            exec $SHELL
+
+            git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+            echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+            exec $SHELL
+
+            git clone https://github.com/sstephenson/rbenv-gem-rehash.git ~/.rbenv/plugins/rbenv-gem-rehash
+
+            rbenv install 2.2.1
+            rbenv global 2.2.1
+            print $(ruby -v)
+
+        elif [[ $type == "v" ]]
+            sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
+            curl -L https://get.rvm.io | bash -s stable
+            source ~/.rvm/scripts/rvm
+            rvm install 2.2.1
+            rvm use 2.2.1 --default
+            print $(ruby -v)
+
+            echo "gem: --no-ri --no-rdoc" > ~/.gemrc
+            gem install bundler
+
+        fi
+
         ;;
     s)
         mkdir -p ${DEV_DIR}/shell
@@ -37,16 +124,41 @@ do  case "$o" in
         ;;
     f)
         mkdir -p ${DEV_DIR}/chef
+
+        wget "https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_${CHEFDK_VER}_amd64.deb"
+        dpkg -i chefdk_${CHEFDK_VER}_amd64.deb
         ;;
-    *)    print >&2 "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-s] [-q] [-v] [-c]"
-            print >&2 "-c Make a folder for C & C++ programming."
-            print >&2 "-g Make a folder go programming."
-            print >&2 "-j Make a folder for java programming."
-            print >&2 "-p Make a folder for python programming."
-            print >&2 "-r Make a folder for shell programming."
-            print >&2 "-s Make a folder for qt programming."
-            print >&2 "-v Make a folder for vagrant."
-            print >&2 "-f Make a folder for chef."
+    i)
+        if ! which git > /dev/null; then
+            echo "Install git..."
+            sudo apt-get install git -y > /dev/null
+        fi
+
+        #create git configuration if not exist, otherwise use existent (~/.gitconfig)
+        if [ -f $HOME/.gitconfig ]; then
+            GITUSER=$(cat .gitconfig | sed -rn 's/name[ ]*=[ ]*([a-zA-Z0-9 ]*)/\1/p')
+            GITEMAIL=$(cat .gitconfig | sed -rn 's/email[ ]*=[ ]*([a-zA-Z0-9 ]*)/\1/p')
+        else
+            echo "Setup git"
+            echo -n "Git user ";read GITUSER
+            echo -n "Git email [ENTER for $GITUSER@gmail.com] ";read GITEMAIL
+            #try to guess git email
+            if [ -z "$GITEMAIL" ]; then GITEMAIL="$GITUSER@gmail.com"; fi
+            git config --global user.name "$GITUSER"
+            git config --global user.email "$GITEMAIL"
+        fi
+
+    *)    
+        print >&2 "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-s] [-q] [-v] [-f]"
+        print >&2 "-c C & C++"
+        print >&2 "-g go"
+        print >&2 "-j java"
+        print >&2 "-p python"
+        print >&2 "-r ruby"
+        print >&2 "-s shell"
+        print >&2 "-q qt"
+        print >&2 "-v vagrant."
+        print >&2 "-f chef."
         exit 1;;
     esac
 done
