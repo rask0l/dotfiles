@@ -1,21 +1,22 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 DEV_DIR=${HOME}/Development
 
 RUBY_VER="2.2.1"
 CHEFDK_VER="0.4.0-1"
 
-sudo apt-get update
+# sudo apt-get update
 mkdir -p $DEV_DIR
 
-while getopts cgjprsqvf o
+while getopts cgjprsqvfim o
 do  case "$o" in
     c)
-        mkdir -p ${DEV_DIR}/c
+        # C / C++
+
         ;;
     g)
+        # golang 
         mkdir -p ${DEV_DIR}/go
-
 
         #get last version of go compiler (e.g. go1.3.3.)
         #B0009
@@ -57,9 +58,12 @@ do  case "$o" in
         GOPATH=${DEV_DIR}/go
         mkdir -p $GOPATH/src
 
+        echo "export GO_PATH=\"/home/raskol/go\""
+
         ;;
     j)
-        mkdir -p ${DEV_DIR}/java
+        # java
+
         sudo add-apt-repository ppa:webupd8team/java
         sudo apt-get update
         #sudo apt-get install oracle-java8-installer
@@ -67,10 +71,10 @@ do  case "$o" in
         sudo apt-get install oracle-java8-set-default
         ;;
     p)
-        mkdir -p ${DEV_DIR}/python
+        # python 
         ;;
     r)
-        mkdir -p ${DEV_DIR}/ruby
+        # ruby
 
         print -n "r[v]m or r[b]env? (v/b): "
         read type
@@ -97,6 +101,7 @@ do  case "$o" in
             print $(ruby -v)
 
         elif [[ $type == "v" ]]
+        then
             sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
             curl -L https://get.rvm.io | bash -s stable
             source ~/.rvm/scripts/rvm
@@ -110,55 +115,69 @@ do  case "$o" in
         fi
 
         ;;
-    s)
-        mkdir -p ${DEV_DIR}/shell
-        ;;
     q)
-        mkdir -p ${DEV_DIR}/qt
+        # QT 
         ;;
     v)
+        # vagrant
         mkdir -p ${DEV_DIR}/vagrant
-        apt-get install virtualbox
-        apt-get install vagrant
-        apt-get install virtualbox-dkms        
+        sudo apt-get install virtualbox
+        sudo apt-get install vagrant
+        sudo apt-get install virtualbox-dkms        
         ;;
     f)
+        # chef
         mkdir -p ${DEV_DIR}/chef
 
         wget "https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_${CHEFDK_VER}_amd64.deb"
         dpkg -i chefdk_${CHEFDK_VER}_amd64.deb
         ;;
     i)
+        # git 
         if ! which git > /dev/null; then
             echo "Install git..."
             sudo apt-get install git -y > /dev/null
         fi
 
-        #create git configuration if not exist, otherwise use existent (~/.gitconfig)
-        if [ -f $HOME/.gitconfig ]; then
-            GITUSER=$(cat .gitconfig | sed -rn 's/name[ ]*=[ ]*([a-zA-Z0-9 ]*)/\1/p')
-            GITEMAIL=$(cat .gitconfig | sed -rn 's/email[ ]*=[ ]*([a-zA-Z0-9 ]*)/\1/p')
-        else
-            echo "Setup git"
-            echo -n "Git user ";read GITUSER
-            echo -n "Git email [ENTER for $GITUSER@gmail.com] ";read GITEMAIL
-            #try to guess git email
-            if [ -z "$GITEMAIL" ]; then GITEMAIL="$GITUSER@gmail.com"; fi
-            git config --global user.name "$GITUSER"
-            git config --global user.email "$GITEMAIL"
-        fi
+        echo "Setup git"
+        echo -n "Git user ";read GITUSER
+        echo -n "Git email [ENTER for $GITUSER@gmail.com] ";read GITEMAIL
+        #try to guess git email
+        if [ -z "$GITEMAIL" ]; then GITEMAIL="$GITUSER@gmail.com"; fi
+        git config --global user.name "$GITUSER"
+        git config --global user.email "$GITEMAIL"
+        sudo apt-get install git-flow
+        ;;
+    m)
+        # vim
+        print -n "Installing vundle..."
+        if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]] {
+            print " already exists."
+        } else {
+            git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+            vim +PluginInstall +qall
+        }
+        ;;
+    z)
+        sudo apt-get install zsh
+
 
     *)    
-        print >&2 "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-s] [-q] [-v] [-f]"
-        print >&2 "-c C & C++"
-        print >&2 "-g go"
-        print >&2 "-j java"
-        print >&2 "-p python"
-        print >&2 "-r ruby"
-        print >&2 "-s shell"
-        print >&2 "-q qt"
-        print >&2 "-v vagrant."
-        print >&2 "-f chef."
-        exit 1;;
+        # incorrect usage
+        printf "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-q] [-v] [-f] [-i] [m] [-z]\n" >&2
+        printf "-c C & C++ \n" >&2
+        printf "-g go \n" >&2
+        printf "-j java \n" >&2
+        printf "-p python \n" >&2
+        printf "-r ruby \n" >&2
+        printf "-s shell \n" >&2
+        printf "-q qt \n" >&2
+        printf "-v vagrant. \n" >&2
+        printf "-f chef. \n" >&2
+        printf "-i git. \n" >&2
+        printf "-m vim. \n" >&2
+        printf "-z zsh. \n" >&2
+        exit 1
+        ;;
     esac
 done
