@@ -8,7 +8,7 @@ CHEFDK_VER="0.4.0-1"
 # sudo apt-get update
 mkdir -p $DEV_DIR
 
-while getopts cgjprsqvfim o
+while getopts cgjprqvfimz o
 do  case "$o" in
     c)
         # C / C++
@@ -151,32 +151,32 @@ do  case "$o" in
     m)
         # vim
         print -n "Installing vundle..."
-        if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]] {
+        if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]];
+        then
             print " already exists."
-        } else {
+        else
             git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
             vim +PluginInstall +qall
-        }
+        fi
         ;;
     z)
-        sudo apt-get install zsh
-
-
+        sudo apt-get install -y zsh
+        ;;
     *)    
         # incorrect usage
-        printf "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-q] [-v] [-f] [-i] [m] [-z]\n" >&2
-        printf "-c C & C++ \n" >&2
-        printf "-g go \n" >&2
-        printf "-j java \n" >&2
-        printf "-p python \n" >&2
-        printf "-r ruby \n" >&2
-        printf "-s shell \n" >&2
-        printf "-q qt \n" >&2
-        printf "-v vagrant. \n" >&2
-        printf "-f chef. \n" >&2
-        printf "-i git. \n" >&2
-        printf "-m vim. \n" >&2
-        printf "-z zsh. \n" >&2
+        printf -- "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-q] [-v] [-f] [-i] [m] [-z]\n" 1>&2
+        printf -- "-c C & C++ \n" 1>&2
+        printf -- "-g go \n" 1>&2
+        printf -- "-j java \n" 1>&2
+        printf -- "-p python \n" 1>&2
+        printf -- "-r ruby \n" 1>&2
+        printf -- "-s shell \n" 1>&2
+        printf -- "-q qt \n" 1>&2
+        printf -- "-v vagrant. \n" 1>&2
+        printf -- "-f chef. \n" 1>&2
+        printf -- "-i git. \n" 1>&2
+        printf -- "-m vim. \n" 1>&2
+        printf -- "-z zsh. \n" 1>&2
         exit 1
         ;;
     esac
