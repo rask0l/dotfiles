@@ -66,9 +66,9 @@ do  case "$o" in
 
         sudo add-apt-repository ppa:webupd8team/java
         sudo apt-get update
-        #sudo apt-get install oracle-java8-installer
+        sudo apt-get -y install oracle-java8-installer
         echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-        sudo apt-get install oracle-java8-set-default
+        sudo apt-get -y install oracle-java8-set-default
         ;;
     p)
         # python 
@@ -82,7 +82,7 @@ do  case "$o" in
         if [[ $type == "b" ]]
         then
 
-            sudo apt-get install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev
+            sudo apt-get -y install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev
 
             cd
             git clone git://github.com/sstephenson/rbenv.git .rbenv
@@ -102,7 +102,7 @@ do  case "$o" in
 
         elif [[ $type == "v" ]]
         then
-            sudo apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
+            sudo apt-get -y install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
             curl -L https://get.rvm.io | bash -s stable
             source ~/.rvm/scripts/rvm
             rvm install 2.2.1
@@ -121,9 +121,9 @@ do  case "$o" in
     v)
         # vagrant
         mkdir -p ${DEV_DIR}/vagrant
-        sudo apt-get install virtualbox
-        sudo apt-get install vagrant
-        sudo apt-get install virtualbox-dkms        
+        sudo apt-get -y install virtualbox
+        sudo apt-get -y install vagrant
+        sudo apt-get -y install virtualbox-dkms        
         ;;
     f)
         # chef
@@ -136,7 +136,7 @@ do  case "$o" in
         # git 
         if ! which git > /dev/null; then
             echo "Install git..."
-            sudo apt-get install git -y > /dev/null
+            sudo apt-get -y install git > /dev/null
         fi
 
         echo "Setup git"
@@ -146,7 +146,7 @@ do  case "$o" in
         if [ -z "$GITEMAIL" ]; then GITEMAIL="$GITUSER@gmail.com"; fi
         git config --global user.name "$GITUSER"
         git config --global user.email "$GITEMAIL"
-        sudo apt-get install git-flow
+        sudo apt-get -y install git-flow
         ;;
     m)
         # vim
@@ -160,7 +160,7 @@ do  case "$o" in
         fi
         ;;
     z)
-        sudo apt-get install -y zsh
+        sudo apt-get -y install zsh
         ;;
     *)    
         # incorrect usage
