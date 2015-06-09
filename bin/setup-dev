@@ -1,5 +1,13 @@
 #!/bin/bash
 
+printf  "\n************************************"
+printf  "\n*                                  *"
+printf  "\n*       EASY ENVIRONMENT SETUP     *"
+printf  "\n*            Nick Turner           *"
+printf  "\n*                                  *"
+printf  "\n************************************\n\n"
+
+
 DEV_DIR=${HOME}/Development
 
 RUBY_VER="2.2.1"
@@ -7,6 +15,8 @@ CHEFDK_VER="0.4.0-1"
 
 # sudo apt-get update
 mkdir -p $DEV_DIR
+
+if [[ "$1" == "env" ]]
 
 while getopts cgjprqvfimz o
 do  case "$o" in
@@ -76,7 +86,7 @@ do  case "$o" in
     r)
         # ruby
 
-        print -n "r[v]m or r[b]env? (v/b): "
+        printf "r[v]m or r[b]env? (v/b): \n"
         read type
 
         if [[ $type == "b" ]]
@@ -150,7 +160,7 @@ do  case "$o" in
         ;;
     m)
         # vim
-        print -n "Installing vundle..."
+        printf "Installing vundle...\n"
         if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]];
         then
             print " already exists."
@@ -160,7 +170,15 @@ do  case "$o" in
         fi
         ;;
     z)
+        printf "Installing zsh\n"
         sudo apt-get -y install zsh
+        printf "Installing antigen...\n"
+        if [[ -d "$HOME/.antigen" ]];
+        then
+          print " already exists."
+        else
+          git clone https://github.com/zsh-users/antigen.git ~/.antigen
+        fi
         ;;
     *)    
         # incorrect usage
