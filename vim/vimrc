@@ -1,0 +1,75 @@
+" VIM config file
+" Nick Turner
+" Created on Sunday October 14, 2012
+ 
+set nocompatible
+ 
+syntax on
+filetype off 
+ 
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+
+" Put Bundles here:
+Bundle 'tpope/vim-fugitive'
+Bundle 'Lokaltog/vim-easymotion'
+Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
+Bundle 'tpope/vim-rails.git'
+Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
+Bundle 'scrooloose/nerdtree'
+Bundle 'flazz/vim-colorschemes'
+" snipmate dependencies:
+Bundle "MarcWeber/vim-addon-mw-utils"
+Bundle "tomtom/tlib_vim"
+Bundle "honza/vim-snippets"
+Bundle 'garbas/vim-snipmate'
+Bundle 'vim-ruby/vim-ruby'
+" vim-script repos
+Bundle 'L9'
+Bundle 'FuzzyFinder'
+ 
+" Config
+filetype on
+filetype plugin indent on
+"color slate
+set ts=4 sts=4 sw=4 expandtab
+"autocmd Filetype html setlocal ts=2 sts=2 sw=2 expandtab
+autocmd Filetype ruby setlocal ts=2 sts=2 sw=2 expandtab
+autocmd Filetype javascript setlocal ts=4 sts=4 sw=4 noexpandtab
+autocmd Filetype makefile setlocal sts=4 ts=8  sw=4 noexpandtab
+set number
+set wildmenu
+set wildmode=list:longest,full
+set ignorecase
+set smartcase
+set visualbell
+" set list
+set listchars=tab:▸\ ,eol:¬,trail:·,extends:#,nbsp:.
+set grepprg=grep\ -nH\ $*
+set pastetoggle=<leader>p  " leader + space to enter paste mode, no auto indent 
+ 
+" Plugin settings
+let g:NERDTreeWinSize = 40
+let g:NERDTreeShowBookmarks = 1 
+let g:NERDTreeShowHidden=1
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+ 
+" KEY MAPPINGS
+" Shortcut to rapidly toggle `set list`
+nnoremap <Leader>i i
+inoremap <Leader>i <Esc>
+nmap <leader>l :set list!<CR>
+nmap <silent> <leader><space> :NERDTreeToggle<CR>
+command NT NERDTreeToggle
+command Ff FufFile
+command Fb FufBuffer
+command Fd FufDir
+nmap <leader>ff :Ff<CR>
+nmap <leader>fb :Fb<CR>
+nmap <leader>fd :Fd<CR>
