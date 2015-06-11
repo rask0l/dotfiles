@@ -16,7 +16,50 @@ CHEFDK_VER="0.4.0-1"
 # sudo apt-get update
 mkdir -p $DEV_DIR
 
-if [[ "$1" == "env" ]]
+# function for env subcommand
+function env {
+
+    if [[ "$1" = "ruby" ]]; then
+        printf "Creating ruby environment..."
+        printf "${*:2}"
+    elif [[ "$1" = "java" ]]; then
+        printf "Creating java environment..."
+        printf "${*:2}"
+    elif [[ "$1" = "zsh" ]]; then
+        printf "Creating zsh environment..."
+        printf "${*:2}"
+    fi
+}
+
+# function for help subcommand
+function help {
+
+    exit 0
+
+}
+
+
+# function for config subcommand
+function config {
+
+
+    exit 0
+
+
+}
+
+if [[ "$1" == "env" ]]; then
+    printf "env"
+    env "${*:2}"
+elif [[ "$1" == "help" ]]; then
+    printf "help"
+    help "${*:2}"
+elif [[ "$1" == "config" ]]; then
+    printf "config"
+    config "${*:2}"
+fi
+
+exit 0 
 
 while getopts cgjprqvfimz o
 do  case "$o" in
