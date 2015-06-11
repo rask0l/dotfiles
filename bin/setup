@@ -2,8 +2,8 @@
 
 printf  "\n************************************"
 printf  "\n*                                  *"
-printf  "\n*       EASY ENVIRONMENT SETUP     *"
-printf  "\n*            Nick Turner           *"
+printf  "\n*      EASY ENVIRONMENT SETUP      *"
+printf  "\n*           Nick Turner            *"
 printf  "\n*                                  *"
 printf  "\n************************************\n\n"
 
@@ -16,229 +16,227 @@ CHEFDK_VER="0.4.0-1"
 # sudo apt-get update
 mkdir -p $DEV_DIR
 
+# extract main sub command
+function main {
+    if [[ "$1" == "env" ]]; then
+        shift
+        env $@
+    elif [[ "$1" == "help" ]]; then
+        help
+    elif [[ "$1" == "config" ]]; then
+        shift
+        env $@
+    fi
+}
+
 # function for env subcommand
 function env {
 
     if [[ "$1" = "ruby" ]]; then
-        printf "Creating ruby environment..."
-        printf "${*:2}"
+        printf "Creating ruby environment...\n"
+        ruby
+        printf "${*:2}\n"
     elif [[ "$1" = "java" ]]; then
-        printf "Creating java environment..."
-        printf "${*:2}"
+        printf "Creating java environment...\n"
+        java
+        printf "${*:2}\n"
     elif [[ "$1" = "zsh" ]]; then
-        printf "Creating zsh environment..."
-        printf "${*:2}"
+        printf "Creating zsh environment...\n"
+        zsh
+        printf "${*:2}\n"
+    elif [[ "$1" = "go" ]]; then
+        printf "Creating go environment...\n"
+        go
+    elif [[ "$1" = "vagrant" ]]; then
+        printf "Creating vagrant environment...\n"
+        vagrant
+    elif [[ "$1" = "chef" ]]; then
+        printf "Creating chef environment...\n"
+        chef
+    elif [[ "$1" = "vim" ]]; then
+        printf "Creating vim environment...\n"
+        vim
+    elif [[ "$1" = "git" ]]; then
+        printf "Creating git environment...\n"
+        git
     fi
 }
 
 # function for help subcommand
 function help {
-
+    usage
     exit 0
-
 }
 
 
 # function for config subcommand
 function config {
-
-
     exit 0
+}
 
+function ruby {
+
+    # ruby
+
+    printf "r[v]m or r[b]env? (v/b): \n"
+    read type
+
+    if [[ $type == "b" ]]
+    then
+
+        sudo apt-get -y install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev
+
+        cd
+        git clone git://github.com/sstephenson/rbenv.git .rbenv
+        echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+        echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+        exec $SHELL
+
+        git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+        echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+        exec $SHELL
+
+        git clone https://github.com/sstephenson/rbenv-gem-rehash.git ~/.rbenv/plugins/rbenv-gem-rehash
+
+        rbenv install 2.2.1
+        rbenv global 2.2.1
+        print $(ruby -v)
+
+    elif [[ $type == "v" ]]
+    then
+        sudo apt-get -y install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
+        curl -L https://get.rvm.io | bash -s stable
+        source ~/.rvm/scripts/rvm
+        rvm install 2.2.1
+        rvm use 2.2.1 --default
+        print $(ruby -v)
+
+        echo "gem: --no-ri --no-rdoc" > ~/.gemrc
+        gem install bundler
+
+    fi 
+}
+
+
+function java {
+    # java
+
+    sudo add-apt-repository ppa:webupd8team/java
+    sudo apt-get update
+    sudo apt-get -y install oracle-java8-installer
+    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+    sudo apt-get -y install oracle-java8-set-default
 
 }
 
-if [[ "$1" == "env" ]]; then
-    printf "env"
-    env "${*:2}"
-elif [[ "$1" == "help" ]]; then
-    printf "help"
-    help "${*:2}"
-elif [[ "$1" == "config" ]]; then
-    printf "config"
-    config "${*:2}"
-fi
+function zsh {
+    printf "Installing zsh\n"
+    sudo apt-get -y install zsh
+    printf "Installing antigen...\n"
+    if [[ -d "$HOME/.antigen" ]];
+    then
+      print " already exists."
+    else
+      git clone https://github.com/zsh-users/antigen.git ~/.antigen
+    fi
+ 
+}
 
+function go {
+    # golang 
+    mkdir -p ${DEV_DIR}/go
+
+    #get last version of go compiler (e.g. go1.3.3.)
+    #B0009
+    v=`echo $(wget -qO- golang.org) | awk '{ if (match($0,/go([0-9]+.)+/)) print substr($0,RSTART,RLENGTH) }'`
+
+    #exit if no network connection otherwise the rest will fail 
+    #B0003
+    if [ -z "$v" ]; then
+       echo "No network connection"
+       exit
+    fi
+
+    #get host computer arch (e.g. i686|amd64)
+    #B0002,B0007
+    case $(uname -m) in
+    i686 ) a="386";;
+       * ) a="amd64";;
+    esac
+
+    #get kernel name (e.g. linux|freebsd)
+    k=$(uname -s | tr '[:upper:]' '[:lower:]')
+
+    #B0005
+    test -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
+
+    #build compiler name (e.g. go1.3.3.linux-386.tar.gz)
+    n=${v}${k}-${a}.tar.gz
+
+    echo "Download last compiler $n..."
+    #ERROR: certificate common name `*.googleusercontent.com' doesn't match requested host name `storage.googleapis.com'.
+    #To connect to storage.googleapis.com insecurely, use `--no-check-certificate'.
+    #WORKAROUND: old sistems like 10.04 need --no-check-certificate to avoid this error
+    #B0004
+    wget --no-check-certificate -qNP ${XDG_DOWNLOAD_DIR} https://storage.googleapis.com/golang/$n
+    echo "Unpack..."
+    tar -xf ${XDG_DOWNLOAD_DIR}/$n -C $HOME
+
+    echo "Create \$GOPATH"
+    GOPATH=${DEV_DIR}/go
+    mkdir -p ${GOPATH}/src
+
+    echo "export GO_PATH=\"${HOME}/go\""
+
+}
+
+function vagrant {
+    # vagrant
+    mkdir -p ${DEV_DIR}/vagrant
+    sudo apt-get -y install virtualbox
+    sudo apt-get -y install vagrant
+    sudo apt-get -y install virtualbox-dkms        
+
+}
+
+function chef {
+    # chef
+    mkdir -p ${DEV_DIR}/chef
+
+    wget "https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_${CHEFDK_VER}_amd64.deb"
+    dpkg -i chefdk_${CHEFDK_VER}_amd64.deb
+
+}
+
+function vim {
+    # vim
+    printf "Installing vundle...\n"
+    if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]];
+    then
+        print " already exists."
+    else
+        git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+        vim +PluginInstall +qall
+    fi
+}
+
+function git {
+    # git 
+    if ! which git > /dev/null; then
+        echo "Install git..."
+        sudo apt-get -y install git > /dev/null
+    fi
+
+    echo "Setup git"
+    echo -n "Git user ";read GITUSER
+    echo -n "Git email [ENTER for $GITUSER@gmail.com] ";read GITEMAIL
+    #try to guess git email
+    if [ -z "$GITEMAIL" ]; then GITEMAIL="$GITUSER@gmail.com"; fi
+    git config --global user.name "$GITUSER"
+    git config --global user.email "$GITEMAIL"
+    sudo apt-get -y install git-flow
+}
+
+main $@
 exit 0 
 
-while getopts cgjprqvfimz o
-do  case "$o" in
-    c)
-        # C / C++
-
-        ;;
-    g)
-        # golang 
-        mkdir -p ${DEV_DIR}/go
-
-        #get last version of go compiler (e.g. go1.3.3.)
-        #B0009
-        v=`echo $(wget -qO- golang.org) | awk '{ if (match($0,/go([0-9]+.)+/)) print substr($0,RSTART,RLENGTH) }'`
-
-        #exit if no network connection otherwise the rest will fail 
-        #B0003
-        if [ -z "$v" ]; then
-           echo "No network connection"
-           exit
-        fi
-
-        #get host computer arch (e.g. i686|amd64)
-        #B0002,B0007
-        case $(uname -m) in
-        i686 ) a="386";;
-           * ) a="amd64";;
-        esac
-
-        #get kernel name (e.g. linux|freebsd)
-        k=$(uname -s | tr '[:upper:]' '[:lower:]')
-
-        #B0005
-        test -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs && source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
-
-        #build compiler name (e.g. go1.3.3.linux-386.tar.gz)
-        n=${v}${k}-${a}.tar.gz
-
-        echo "Download last compiler $n..."
-        #ERROR: certificate common name `*.googleusercontent.com' doesn't match requested host name `storage.googleapis.com'.
-        #To connect to storage.googleapis.com insecurely, use `--no-check-certificate'.
-        #WORKAROUND: old sistems like 10.04 need --no-check-certificate to avoid this error
-        #B0004
-        wget --no-check-certificate -qNP ${XDG_DOWNLOAD_DIR} https://storage.googleapis.com/golang/$n
-        echo "Unpack..."
-        tar -xf ${XDG_DOWNLOAD_DIR}/$n -C $HOME
-
-        echo "Create \$GOPATH"
-        GOPATH=${DEV_DIR}/go
-        mkdir -p $GOPATH/src
-
-        echo "export GO_PATH=\"/home/raskol/go\""
-
-        ;;
-    j)
-        # java
-
-        sudo add-apt-repository ppa:webupd8team/java
-        sudo apt-get update
-        sudo apt-get -y install oracle-java8-installer
-        echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-        sudo apt-get -y install oracle-java8-set-default
-        ;;
-    p)
-        # python 
-        ;;
-    r)
-        # ruby
-
-        printf "r[v]m or r[b]env? (v/b): \n"
-        read type
-
-        if [[ $type == "b" ]]
-        then
-
-            sudo apt-get -y install git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev
-
-            cd
-            git clone git://github.com/sstephenson/rbenv.git .rbenv
-            echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-            echo 'eval "$(rbenv init -)"' >> ~/.bashrc
-            exec $SHELL
-
-            git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-            echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
-            exec $SHELL
-
-            git clone https://github.com/sstephenson/rbenv-gem-rehash.git ~/.rbenv/plugins/rbenv-gem-rehash
-
-            rbenv install 2.2.1
-            rbenv global 2.2.1
-            print $(ruby -v)
-
-        elif [[ $type == "v" ]]
-        then
-            sudo apt-get -y install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
-            curl -L https://get.rvm.io | bash -s stable
-            source ~/.rvm/scripts/rvm
-            rvm install 2.2.1
-            rvm use 2.2.1 --default
-            print $(ruby -v)
-
-            echo "gem: --no-ri --no-rdoc" > ~/.gemrc
-            gem install bundler
-
-        fi
-
-        ;;
-    q)
-        # QT 
-        ;;
-    v)
-        # vagrant
-        mkdir -p ${DEV_DIR}/vagrant
-        sudo apt-get -y install virtualbox
-        sudo apt-get -y install vagrant
-        sudo apt-get -y install virtualbox-dkms        
-        ;;
-    f)
-        # chef
-        mkdir -p ${DEV_DIR}/chef
-
-        wget "https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_${CHEFDK_VER}_amd64.deb"
-        dpkg -i chefdk_${CHEFDK_VER}_amd64.deb
-        ;;
-    i)
-        # git 
-        if ! which git > /dev/null; then
-            echo "Install git..."
-            sudo apt-get -y install git > /dev/null
-        fi
-
-        echo "Setup git"
-        echo -n "Git user ";read GITUSER
-        echo -n "Git email [ENTER for $GITUSER@gmail.com] ";read GITEMAIL
-        #try to guess git email
-        if [ -z "$GITEMAIL" ]; then GITEMAIL="$GITUSER@gmail.com"; fi
-        git config --global user.name "$GITUSER"
-        git config --global user.email "$GITEMAIL"
-        sudo apt-get -y install git-flow
-        ;;
-    m)
-        # vim
-        printf "Installing vundle...\n"
-        if [[ -d "$HOME/.vim/bundle/Vundle.vim" ]];
-        then
-            print " already exists."
-        else
-            git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-            vim +PluginInstall +qall
-        fi
-        ;;
-    z)
-        printf "Installing zsh\n"
-        sudo apt-get -y install zsh
-        printf "Installing antigen...\n"
-        if [[ -d "$HOME/.antigen" ]];
-        then
-          print " already exists."
-        else
-          git clone https://github.com/zsh-users/antigen.git ~/.antigen
-        fi
-        ;;
-    *)    
-        # incorrect usage
-        printf -- "Usage: $0 [-c] [-g] [-j] [-p] [-r] [-q] [-v] [-f] [-i] [m] [-z]\n" 1>&2
-        printf -- "-c C & C++ \n" 1>&2
-        printf -- "-g go \n" 1>&2
-        printf -- "-j java \n" 1>&2
-        printf -- "-p python \n" 1>&2
-        printf -- "-r ruby \n" 1>&2
-        printf -- "-s shell \n" 1>&2
-        printf -- "-q qt \n" 1>&2
-        printf -- "-v vagrant. \n" 1>&2
-        printf -- "-f chef. \n" 1>&2
-        printf -- "-i git. \n" 1>&2
-        printf -- "-m vim. \n" 1>&2
-        printf -- "-z zsh. \n" 1>&2
-        exit 1
-        ;;
-    esac
-done
