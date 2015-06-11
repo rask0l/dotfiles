@@ -9,6 +9,7 @@ antigen bundle git
 antigen theme robbyrussell
 antigen apply
 
+export PANEL_FIFO="/tmp/panel-fifo"
 
 if [ -e /home/raskol/.nix-profile/etc/profile.d/nix.sh ]; then . /home/raskol/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
