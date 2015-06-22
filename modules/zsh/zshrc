@@ -1,0 +1,19 @@
+source "${HOME}/.dotfiles/bin/sourcefile.zsh"
+
+source "${HOME}/Development/zgen/zgen.sh"
+
+source "${HOME}/.antigen/antigen.zsh"
+
+zgen use oh-my-zsh
+antigen bundle git
+antigen theme robbyrussell
+antigen apply
+
+export PANEL_FIFO="/tmp/panel-fifo"
+
+if [ -e /home/raskol/.nix-profile/etc/profile.d/nix.sh ]; then . /home/raskol/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
+[[ -s "/home/raskol/.gvm/scripts/gvm" ]] && source "/home/raskol/.gvm/scripts/gvm"
