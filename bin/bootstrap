@@ -1,24 +1,24 @@
 #!/bin/zsh
 
-dotfile_root="$HOME/.dotfiles"
-dotfiles="${dotfile_root}/dotfiles"
-zsh_sourcefile="${dotfile_root}/bin/sourcefile.zsh"
+dotfile_manager_root="$HOME/.dotfiles-manager"
+dotfiles="${dotfile_manager_root}/dotfiles"
+zsh_sourcefile="${dotfile_manager_root}/bin/sourcefile.zsh"
 
 check_installation() {
 
-    if [[ ! -d $dotfile_root ]] {
+    if [[ ! -d $dotfile_manager_root ]] {
         print "Dotfiles was not installed correctly.  Be sure to install it in '~/.dotfiles'.  "
         exit 1
     }
 }
 
-add_dotfiles() {
-  generate_sourcefile_zsh
-  for src in $(find "$dotfiles" -maxdepth 2 -type f -regextype posix-extended -regex ".*rc|.*config|.*zsh|.*\.symlink")
-  do
+process_dotfile() {
+    src=$1
     print -n "Found $src..."
     if [[ $src =~ ".*rc|.*config" ]] {
-      # if $src ends with 'rc' or 'config', symlink it to '.$src', i.e. .dotfiles/dotfiles/vim/vimrc -> /home/user/.vimrc
+      # if $src ends with 'rc' or 'config', symlink it to '.$src', 
+      # i.e. dotfiles/modules/vim/vimrc -> /home/user/.vimrc
+      #      dotfiles/modules/git/gitconfig -> /home/user/.gitconfig
       dst="$HOME/.$(basename "${src##*/}")"
       if [[ -f "$dst" ]] {
         print " Link to $dst already exists."
@@ -27,7 +27,7 @@ add_dotfiles() {
         ln -sv "$src" "$dst"
       }
     } elif [[ $src =~ ".*\.symlink" ]] {
-      # if $src ends with '.symlink', symlink it to '.src' and remove the .symlink extension.
+      # if $src ends with '.symlink', symlink it to '.$src' and remove the .symlink extension.
       dst="$HOME/.$(basename "${${a%.*}##*/}")"
       if [[ -f "$dst" ]] {
         print " Link to $dst already exists."
@@ -39,9 +39,32 @@ add_dotfiles() {
       print " Adding ${src} to sourcefile."
       print "source ${src}" >> "$zsh_sourcefile"
     }
-    
+} 
 
+dotfile_regex_str=".*rc|.*config|.*zsh|.*\.symlink"
+
+add_dotfiles() {
+
+  generate_sourcefile_zsh
+
+  echo "Processing default files..."
+  # find each default file and process it
+  for file in $(find "$dotfiles/default" -maxdepth 3 -type f -regextype posix-extended -regex $dotfile_regex_str)
+  do
+    echo $file
+    process_dotfile $file    
   done
+
+  echo "Processing modules..."
+  # for each module (must be in a directory of the same name) modules.conf, find it in dotfiles and process it
+  while read module 
+  do 
+    for file in $(find $dotfiles/modules -regextype posix-extended -regex "$dotfiles/modules/$module/.+" -print)
+    do
+      echo $file
+      process_dotfile $file 
+    done
+  done < dotfiles/modules.conf 
 }
 
 #install_deps() {
