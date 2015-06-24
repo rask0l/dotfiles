@@ -59,6 +59,9 @@ function env {
     elif [[ "$1" = "git" ]]; then
         printf "Creating git environment...\n"
         git
+    elif [[ "$1" = "python" ]]; then
+        printf "Creating python environment...\n"
+        python
     fi
 }
 
@@ -235,6 +238,13 @@ function git {
     git config --global user.name "$GITUSER"
     git config --global user.email "$GITEMAIL"
     sudo apt-get -y install git-flow
+}
+
+function python {
+    wget https://bootstrap.pypa.io/get-pip.py    
+    chmod +x get-pip.py
+    sudo -H ./get-pip.py
+    rm get-pip.py
 }
 
 main $@
