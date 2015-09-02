@@ -11,7 +11,7 @@ def find(name, path):
             return os.path.join(root, name)
 
 
-def link_module(module_name):
+def link_module(module_name, bool_link):
 
     with open("../dotfiles/" + module_name + "/module.yaml", 'r') as stream:
         module = yaml.load(stream)
@@ -19,42 +19,56 @@ def link_module(module_name):
     if not module:
         return
 
-    for file in module['files']:
-        name = ""
+    files = module['files']
+    file_names = module['files'].keys()
+    for file in file_names:
         
-        if file.keys()[0]:
-            name = file.keys()[0]
-        else:
-            print("You must give each file a name.")
-            continue
-    
-        src_file_name, dest_file_name = file.iteritems().next() 
+        src_file_name, dest_file_name = file, files[file]
         src = os.path.abspath(find( src_file_name, "../dotfiles/"))
         dest = os.path.expanduser("~") + "/" + dest_file_name
-        print("Linking " + src + " to " + dest + ".")
-
-        if os.path.isfile(dest):
-            print("Skipping " + dest + ", it already exists") 
+       
+        # pass true to link, false to unlink
+        if bool_link: 
+            print("Linking " + src + " to " + dest + ".")
+            if os.path.isfile(dest):
+                print("Skipping " + dest + ", it already exists") 
+            else:
+                os.symlink(src, dest)
         else:
-            os.symlink(src, dest)
+            print("Unlinking" + dest + " from " + src + ".")
+            if os.path.isfile(dest):
+                os.unlink(dest)
+            else:
+                print("Skipping " + dest + ", it does not exist") 
 
 
-def link_all():
+def link_all(bool_link):
 
     with open("../dotfiles/dotfiles.yaml", 'r') as stream:
         modules = yaml.load(stream)
 
-    link_module("default")
+    link_module("default", bool_link)
 
     for module in modules["modules"]:
-        link_module(module)
+        link_module(module, bool_link)
 
+
+def usage():
+    print("link_files.py -u | -l")
+    print("-l: Symlinks files in dotfiles directory to home directory.")
+    print("-u: Reverses process by unlinking symlinks.")
+    exit(1)       
 
 if __name__ == "__main__":
-    link_all()
-
+    if len(sys.argv) != 2:
+        usage()
+    
+    if sys.argv[1] == "-u":
+        link_all(False)
+    elif sys.argv[1] == "-l":
+        link_all(True)
+    else:
+        usage()
  
-
-       
 
 
