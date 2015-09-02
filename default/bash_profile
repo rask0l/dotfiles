@@ -2,4 +2,4 @@ export GOPATH=~/go
 export PATH=$PATH:$GOPATH/bin
 if [ -e /home/raskol/.nix-profile/etc/profile.d/nix.sh ]; then . /home/raskol/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
-export USER_ACCESS_TOKEN=f4de48cd046c6feab2077081a97134754c11bc2a
+export USER_ACCESS_TOKEN=$(cat ~/.github_access_token)
