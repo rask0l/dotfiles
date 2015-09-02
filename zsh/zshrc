@@ -1,19 +1,57 @@
-source "${HOME}/.dotfiles/bin/sourcefile.zsh"
+# load zgen
+source "${HOME}/Development/zgen/zgen.zsh"
 
-source "${HOME}/Development/zgen/zgen.sh"
+# check if there's no init script
+if ! zgen saved; then
+    echo "Creating a zgen save"
 
-source "${HOME}/.antigen/antigen.zsh"
+    zgen oh-my-zsh
 
-zgen use oh-my-zsh
-antigen bundle git
-antigen theme robbyrussell
-antigen apply
+    # plugins
+    zgen oh-my-zsh plugins/git
+    zgen oh-my-zsh plugins/sudo
+    zgen oh-my-zsh plugins/command-not-found
+    zgen load zsh-users/zsh-syntax-highlighting
 
-export PANEL_FIFO="/tmp/panel-fifo"
+    # bulk load
+    zgen loadall <<EOPLUGINS
+        zsh-users/zsh-history-substring-search
+        /path/to/local/plugin
+EOPLUGINS
+    # ^ can't indent this EOPLUGINS
 
+    # completions
+    zgen load zsh-users/zsh-completions src
+
+    # theme
+    zgen oh-my-zsh themes/arrow
+
+    # save all to init script
+    zgen save
+fi
+
+
+# nix
 if [ -e /home/raskol/.nix-profile/etc/profile.d/nix.sh ]; then . /home/raskol/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
+# rbenv
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
 
+# gvm
 [[ -s "/home/raskol/.gvm/scripts/gvm" ]] && source "/home/raskol/.gvm/scripts/gvm"
+
+# go
+#export PATH="$PATH:$HOME/go/bin
+export GOPATH=~/go
+export PATH=$PATH:$GOPATH/bin
+
+export USER_ACCESS_TOKEN=$(cat ~/.github_access_token)
+
+# The next line updates PATH for the Google Cloud SDK.
+source '/home/raskol/Applications/google-cloud-sdk/path.zsh.inc'
+
+# The next line enables bash completion for gcloud.
+source '/home/raskol/Applications/google-cloud-sdk/completion.zsh.inc'
+
+
