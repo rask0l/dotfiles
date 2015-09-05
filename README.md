@@ -1,4 +1,4 @@
-dotfiles
+dotfiles-manager
 ========
 
 This is my dotfiles management suite.  It is simple and opinionated when it can be, and customizable when it must be.  
@@ -9,28 +9,17 @@ Enjoy.
 Getting Started
 ---------------
 
-Clone dotfiles into ~/.dotfiles:
+Clone into ~/.dotfiles-manager:
 ```
-git clone https://github.com/rask0l/dotfiles.git ~/.dotfiles && ~/.dotfiles/bin/bootstrap
+git clone https://github.com/nckturner/dotfiles-manager.git ~/.dotfiles-manager #&& ~/.dotfiles/bin/bootstrap.py
 ```
+NOTE: bootstrap script in progress
+TODO: fix above bootstrap script
 
-Adding dotfiles
+Dotfiles structure
 ---------------
-
-Dotfiles must be put in a subfolder of the dotfiles folder.  The name of the subfolder must match the module name in dotfiles/dotfiles.yaml.  
-Example dotfiles.yaml file: 
-
-  modules:
-    - vim
-    - zsh
-
-This means files in `dotfiles/vim` and `dotfiles/zsh` will be symlinked to your home directory, for example:
-
-~/.vimrc -> ~/dotfiles-manager/dotfiles/vim/vimrc
-~/.zshrc -> ~/dotfiles-manager/dotfiles/zsh/zshrc
-
+TODO
 
 Ignoring dotfiles
 -----------------
-
-Todo
+TODO
