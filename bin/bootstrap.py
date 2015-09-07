@@ -1,13 +1,7 @@
 #!/usr/bin/python
-# bootstap.py
-#
-# Checks dotfiles installation and 
-import check_deps
 
-dotfile_manager_root = "$HOME/.dotfiles-manager"
-dotfiles = dotfile_manager_root + "/dotfiles"
-modules_conf = dotfiles + "/modules.yaml"
-zsh_sourcefile = dotfile_manager_root + "/bin/sourcefile.zsh"
+import check_deps
+import config
 
 
 def check_installation():

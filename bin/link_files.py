@@ -3,6 +3,7 @@
 import yaml
 import os
 import sys
+import config
 
 
 def find(name, path):
@@ -13,7 +14,7 @@ def find(name, path):
 
 def link_module(module_name, bool_link):
 
-    with open("../dotfiles/" + module_name + "/module.yaml", 'r') as stream:
+    with open(config.dotfiles_dir + module_name + "/" + "module.yaml", 'r') as stream:
         module = yaml.load(stream)
   
     if not module:
@@ -24,8 +25,8 @@ def link_module(module_name, bool_link):
     for file in file_names:
         
         src_file_name, dest_file_name = file, files[file]
-        src = os.path.abspath(find( src_file_name, "../dotfiles/"))
-        dest = os.path.expanduser("~") + "/" + dest_file_name
+        src = os.path.abspath(find( src_file_name, config.dotfiles_dir))
+        dest = config.home + dest_file_name
        
         # pass true to link, false to unlink
         if bool_link: 
@@ -44,7 +45,7 @@ def link_module(module_name, bool_link):
 
 def link_all(bool_link):
 
-    with open("../dotfiles/dotfiles.yaml", 'r') as stream:
+    with open(config.dotfiles_conf, 'r') as stream:
         modules = yaml.load(stream)
 
     link_module("default", bool_link)
