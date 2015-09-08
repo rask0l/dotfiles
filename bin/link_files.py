@@ -30,6 +30,10 @@ def link_module(module_name, bool_link):
        
         # pass true to link, false to unlink
         if bool_link: 
+            path, fn = os.path.split(dest)
+            if not os.path.exists(path):
+                print("Creating dirs in path: " + path)
+                os.makedirs(path)
             print("Linking " + src + " to " + dest + ".")
             if os.path.isfile(dest):
                 print("Skipping " + dest + ", it already exists") 
