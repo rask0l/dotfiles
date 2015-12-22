@@ -31,17 +31,21 @@ def link_module(module_name, bool_link):
         # pass true to link, false to unlink
         if bool_link: 
             path, fn = os.path.split(dest)
-            if not os.path.exists(path):
+            # lexists returns true for broken links, we could replace those links but 
+            # for simplicity we just ignore them.  Passing -u will unlink them and 
+            # they can be readded correctly with another run of -l.  
+            if not os.path.lexists(path):
                 print("Creating dirs in path: " + path)
                 os.makedirs(path)
-            print("Linking " + src + " to " + dest + ".")
+            print("Linking " + dest + " to " + src + ".")
             if os.path.isfile(dest):
                 print("Skipping " + dest + ", it already exists") 
             else:
                 os.symlink(src, dest)
         else:
             print("Unlinking" + dest + " from " + src + ".")
-            if os.path.isfile(dest):
+            # lexists returns true for broken links
+            if os.path.lexists(dest):
                 os.unlink(dest)
             else:
                 print("Skipping " + dest + ", it does not exist") 
