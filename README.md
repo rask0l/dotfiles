@@ -39,6 +39,7 @@ The dotfiles repository must be a sibling to the dotfiles manager.  The overall 
    |-go
      |-go.sh
      |-module.yaml
+```
 
 ### link_files.py
 This script must be run to create the necessary symlinks from your .dotfiles repository to your $HOME directory.  It will tell you what it finds and successfully links and what it skipped due to links already being present.  
