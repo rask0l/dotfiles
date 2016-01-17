@@ -5,11 +5,6 @@ import os
 import sys
 import config
 
-red = "\033[1;31m" 
-green = "\033[1;32m" 
-crimson = "\033[1;38m" 
-color_end = "\033[1;m"
-
 def find(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
@@ -43,18 +38,18 @@ def link_module(module_name, bool_link):
                 os.makedirs(path)
             print("Linking " + dest + " to " + src + ".")
             if os.path.isfile(dest):
-                print(red + "- Skipping " + color_end + dest + ", it already exists") 
+                print(config.red + "- Skipping " + config.color_end + dest + ", it already exists") 
             else:
                 os.symlink(src, dest)
-                print(green + "+ Success!" + color_end) 
+                print(config.green + "+ Success!" + config.color_end) 
         else:
             print("Unlinking" + dest + " from " + src + ".")
             # lexists returns true for broken links
             if os.path.lexists(dest):
                 os.unlink(dest)
-                print(green + "+ Success!" + color_end) 
+                print(config.green + "+ Success!" + config.color_end) 
             else:
-                print(red + "- Skipping " + color_end + dest + ", it does not exist") 
+                print(config.red + "- Skipping " + config.color_end + dest + ", it does not exist") 
 
 
 def link_all(bool_link):
