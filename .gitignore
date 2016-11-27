@@ -1,2 +1,3 @@
 dotfiles/*
 *.pyc
+.venv
