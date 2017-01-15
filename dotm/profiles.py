@@ -40,6 +40,11 @@ class Profile():
         for m in self.modules():
             module.link()
 
+    def unlink(self):
+        """ Unlink all modules in profile. """
+        for m in self.modules():
+            module.unlink()
+
 def avail():
     """ Returns list of available profiles as Profiles() """
     ignore = ['git']

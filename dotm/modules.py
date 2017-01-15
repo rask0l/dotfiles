@@ -19,6 +19,12 @@ def avail():
     ignore = ['.git']
     module_dir = os.path.join(config.dotfiles_dir,'modules')
     return util.list_dirs(module_dir, ignore)
+    
+#def _abs(path):
+#    return os.path.abspath(path)
+
+def _abs(*args):
+    return os.path.abspath(os.path.join(*args))
 
 class Link():
     def __init__(self, target, link):
@@ -30,21 +36,32 @@ class Link():
         self.target = target
         self.link = link
 
-    def create(self):
+    def __eq__(self, other):
+        return ((_abs(self.target), _abs(self.link)) == 
+                (_abs(other.target), _abs(other.link)))
+
+    def __hash__(self):
+        return hash((self.target,self.link))
+
+
+    def create(self, dry_run):
         log.debug("link {} -> target {}".format(self.link, self.target))
         path, f = os.path.split(self.link)
-        if not util.path_exists(path):
-            os.makedirs(path)
+        if not os.path.exists(path):
+            if not dry_run: 
+                os.makedirs(path)
         if os.path.isfile(self.link):
             log.debug(config.red + "Skipping " + config.color_end + self.link + ", it already exists") 
         else:
-            os.symlink(self.target, self.link)
+            if not dry_run: 
+                os.symlink(self.target, self.link)
             log.debug(config.green + "+ Success!" + config.color_end) 
 
-    def remove(self):
+    def remove(self, dry_run):
         log.debug("removing link {} -> target {}".format(self.link, self.target))
         if os.path.lexists(self.link):
-            os.unlink(self.link)
+            if not dry_run: 
+                os.unlink(self.link)
             log.debug(config.green + "+ Success!" + config.color_end) 
         else:
             log.debug(config.red + "- Skipping " + config.color_end + dest + ", it does not exist") 
@@ -73,9 +90,6 @@ class Module():
         links = self._config['links']
         targets = links.keys()
 
-        def _abs(*args):
-            return os.path.abspath(os.path.join(*args))
-
         return [Link(
                     _abs(config.dotfiles_dir,"modules",self.name,t),
                     _abs(os.path.join(config.home,links[t]))) 
@@ -88,17 +102,17 @@ class Module():
     def config_path(self):
         return 
 
-    def link(self):
+    def link(self, dry_run):
         """ Create links for this module. """
         log.debug("Linking module {}.".format(self.name))
 
         for l in self.links:
-            l.create()
+            l.create(dry_run)
 
-    def unlink(self):
+    def unlink(self, dry_run):
         """ Remove links for this module. """
         log.debug("Unlinking module {}.".format(self.name))
 
         for l in self.links:
-            l.remove()
+            l.remove(dry_run)
         

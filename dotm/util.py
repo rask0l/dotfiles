@@ -14,15 +14,9 @@ def list_dirs(dirname, ignore):
             dirs.append(e)
     return dirs
 
-def print_list(l):
-    s = ""
-    for idx,item in enumerate(l):
-        if idx != len(l)-1:
-            s += str(item) + ", "
-        else:
-            s += str(item) + "\n"
-    print(s)
+def abs(*args):
+    return os.path.abspath(os.path.join(*args))
 
+def usr(*args):
+    return os.path.expanduser(os.path.join(*args))
 
-def path_exists(path):
-    return os.path.lexists(path)

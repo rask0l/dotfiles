@@ -1,27 +1,37 @@
 import sys
 import logging
-log = logging.getLogger("dotm").getChild(__name__)
+import argparse
+log = logging.getLogger('dotm').getChild(__name__)
 
-from .link import LinkCmd
-from .unlink import UnlinkCmd
-from .command import add_command
-from .command import ParseError
+# import cmds
+from .link import link
+from .unlink import unlink
+from .sync import sync
 
-add_command(LinkCmd)
-add_command(UnlinkCmd)
+parser = argparse.ArgumentParser()
+parser.add_argument('--dry-run', action='store_true')
+#subparsers = parser.add_subparsers(help='sub-command help')
+subparsers = parser.add_subparsers()
 
-from .command import parse
-from .command import execute
-from .command import list_commands
+link_parser = subparsers.add_parser('link')
+link_parser.set_defaults(func=link)
+
+unlink_parser = subparsers.add_parser('unlink')
+unlink_parser.set_defaults(func=unlink)
+
+sync_parser = subparsers.add_parser('sync')
+sync_parser.add_argument('--dirs', '-l')
+sync_parser.add_argument('--depth', '-d', type=int)
+sync_parser.set_defaults(func=sync, depth=1, dirs='~,~/.config,~/.config/rc.d,~/.config/zshrc.d')
 
 def run(argv):
-    list_commands()
-    
-    try:
-        parse(argv)
-    except ParseError as e:
-        log.error("Parse failed: {}".format(e.message))
-        sys.exit(1)
-    execute()
+    args = parser.parse_args(argv[1:])
+
+    if hasattr(args, 'func'):
+        args.func(args)
+    else:
+        log.error("You must provide a subcommand.")
+        print(parser.format_help())
+
 
 __all__ = ['run']

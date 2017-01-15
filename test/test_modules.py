@@ -1,27 +1,18 @@
+import logging
 import mock
 import unittest
 
-def avail_modules(d):
-    ignore = ['.git']
-    dirs = []
-    entries = os.listdir(d)
-    for e in entries:
-        d = os.path.join(d, e)
-        if os.path.isdir(d) and e not in ignore:
-            dirs.append(e)
-    print(dirs)
-    return dirs
+import dotm
 
 class TestModules(unittest.TestCase):
-    
-    @patch(
-    def test_avail_modules(self):
-        mods = avail_modules("/test")
-        self.assertEqual(1, 1)
 
-    def test_isupper(self):
-        self.assertTrue(True)
-        self.assertFalse(False)
+    @mock.patch('dotm.util.list_dirs')
+    def test_avail_modules(self, patch_list_dirs):
+        dirs = ['bla','foo']
+        patch_list_dirs.return_value = ['bla','foo']
+        
+        avail = dotm.modules.avail()
+        self.assertListEqual(dirs, avail)
 
 if __name__ == '__main__':
     unittest.main()

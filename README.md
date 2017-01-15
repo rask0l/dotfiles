@@ -118,6 +118,5 @@ TODO:
 
 ✓ run `dotm link` to create softlinks for dotfiles
 ✓ run `dotm unlink` to remove all softlinks for dotfiles
-- remove links that are not in modules.yaml?
-- add links that are in modules.yaml but have not been created yet
+- (sync or clean?) given a directory D and depth d, find all symlinks in D or a subdir (less than depth d children from D) of D that points to a something in ~/.dotfiles (we'll call this group of symlinks A).  Compare to group of desired symlinks specified by modules in active profile (B).  Delete anything in A that's not in B, add anything in B that's not in A.  
 
