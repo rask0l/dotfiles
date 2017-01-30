@@ -1,6 +1,6 @@
 import os
 import subprocess
-import yaml
+from .thirdparty import yaml
 import logging
 
 from . import config

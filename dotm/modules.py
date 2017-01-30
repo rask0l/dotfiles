@@ -1,6 +1,6 @@
 import os
 import logging
-import yaml
+from .thirdparty import yaml
 
 from . import config
 from . import util
