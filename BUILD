@@ -40,6 +40,6 @@ pex_binary(
         "dotm/profiles.py",
         "dotm/modules.py",
     ],
-    interpreter = "/usr/bin/python3",
+    interpreter = "python3",
 )
 

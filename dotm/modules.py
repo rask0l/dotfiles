@@ -4,6 +4,7 @@ from .thirdparty import yaml
 
 from . import config
 from . import util
+from .util import _abs, Link
 
 log = logging.getLogger("dotm").getChild(__name__)
 
@@ -20,55 +21,7 @@ def avail():
     module_dir = os.path.join(config.dotfiles_dir,'modules')
     return util.list_dirs(module_dir, ignore)
     
-#def _abs(path):
-#    return os.path.abspath(path)
-
-def _abs(*args):
-    return os.path.abspath(os.path.join(*args))
-
-class Link():
-    def __init__(self, target, link):
-        """ Represents a softlink
-
-        target: The link source
-        link: The filename of the link
-        """
-        self.target = target
-        self.link = link
-
-    def __eq__(self, other):
-        return ((_abs(self.target), _abs(self.link)) == 
-                (_abs(other.target), _abs(other.link)))
-
-    def __hash__(self):
-        return hash((self.target,self.link))
-
-
-    def create(self, dry_run):
-        log.debug("link {} -> target {}".format(self.link, self.target))
-        path, f = os.path.split(self.link)
-        if not os.path.exists(path):
-            if not dry_run: 
-                os.makedirs(path)
-        if os.path.isfile(self.link):
-            log.debug(config.red + "Skipping " + config.color_end + self.link + ", it already exists") 
-        else:
-            if not dry_run: 
-                os.symlink(self.target, self.link)
-            log.debug(config.green + "+ Success!" + config.color_end) 
-
-    def remove(self, dry_run):
-        log.debug("removing link {} -> target {}".format(self.link, self.target))
-        if os.path.lexists(self.link):
-            if not dry_run: 
-                os.unlink(self.link)
-            log.debug(config.green + "+ Success!" + config.color_end) 
-        else:
-            log.debug(config.red + "- Skipping " + config.color_end + dest + ", it does not exist") 
-
-
 class Module():
-
     def __init__(self, name):
         self.name = name
         self.path = os.path.join(config.modules_dir, name)

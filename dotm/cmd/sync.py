@@ -5,7 +5,7 @@ import re
 from .. import profiles
 from .. import modules
 from .. import config
-from .. import util
+from ..util import _usr, Link
 
 log = logging.getLogger("dotm").getChild(__name__)
 
@@ -16,6 +16,7 @@ def sync(args):
         log.info(" ============= DRY RUN ============= ")
     
     profile = profiles.select()
+
     # args.depth has default, safe to use
     src_dir = config.dotfiles_dir
     dirs = args.dirs
@@ -25,6 +26,8 @@ def sync(args):
         found_links |= links
     mods = profile.modules()
     desired_links = set()
+    for p in profile.links:
+        desired_links.add(p)
     for m in mods:
         for l in m.links:
             desired_links.add(l)
@@ -44,7 +47,7 @@ def find_links_from(dir, depth, src_dir):
     found_links = set()
     nodes = os.listdir(os.path.expanduser(dir))
     for n in nodes: 
-        check_node(util.usr(dir, n), depth, src_dir, found_links)
+        check_node(_usr(dir, n), depth, src_dir, found_links)
     return found_links
         
 
@@ -55,7 +58,7 @@ def check_node(node, depth, src_dir, found_links):
         if check_link(node, src_dir):
             # link target is in src_dir, we want to prune it if its not
             # in a module currently referenced in a profile
-            found_links.add(modules.Link(os.readlink(node), os.path.abspath(node)))
+            found_links.add(Link(os.readlink(node), os.path.abspath(node)))
     elif os.path.isdir(node):
         check_node(node, depth-1, src_dir, found_links)
 

@@ -1,10 +1,11 @@
 import os
 import subprocess
-from .thirdparty import yaml
 import logging
+from .thirdparty import yaml
 
 from . import config
 from . import util
+from .util import _abs, Link
 from . import modules
 
 log = logging.getLogger("dotm").getChild(__name__)
@@ -21,6 +22,7 @@ class Profile():
         self.path = os.path.join(config.profiles_dir, name)
         self.test_path = os.path.join(self.path, 'test')
         self.config_path = os.path.join(self.path, "profile.yaml")
+        self.links = self._get_links()
 
     def test(self):
         if os.path.isfile(self.test_path):
@@ -44,6 +46,20 @@ class Profile():
         """ Unlink all modules in profile. """
         for m in self.modules():
             module.unlink()
+
+    def _get_links(self):
+        """ Profiles can have files and links embedded in them.  This allows for overriding or profile specific 
+        without creating an additional module. """
+        with open(self.config_path, 'r') as f:
+            links = yaml.load(f)["links"]
+            targets = links.keys()
+            return [Link(
+                    _abs(config.dotfiles_dir,"profiles",self.name,t),
+                    _abs(os.path.join(config.home,links[t]))) 
+                for t 
+                in targets]
+
+        
 
 def avail():
     """ Returns list of available profiles as Profiles() """
