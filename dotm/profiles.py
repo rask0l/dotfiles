@@ -35,7 +35,13 @@ class Profile():
     def modules(self):
         """ Return all modules in this profile. """
         with open(self.config_path, 'r') as f:
-            return [ modules.Module(m) for m in yaml.load(f)["modules"] ]
+            yml = yaml.load(f)
+            try: 
+                mods = yml["modules"]
+            except KeyError as e:
+                # No modules
+                return []
+            return [ modules.Module(m) for m in mods ]
 
     def link(self):
         """ Link all modules in profile. """
@@ -51,7 +57,12 @@ class Profile():
         """ Profiles can have files and links embedded in them.  This allows for overriding or profile specific 
         without creating an additional module. """
         with open(self.config_path, 'r') as f:
-            links = yaml.load(f)["links"]
+            yml = yaml.load(f)
+            try: 
+                links = yml["links"]
+            except KeyError as e:
+                # No links in this profile
+                return []
             targets = links.keys()
             return [Link(
                     _abs(config.dotfiles_dir,"profiles",self.name,t),
