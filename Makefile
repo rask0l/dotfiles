@@ -2,13 +2,16 @@ INSTALL ?= ~/bin
 
 .PHONY: build run test
 
-build: 
+build:
 	bazel build //:dotm
 
 test:
 	python3 test/test_modules.py
 
-install: 
+install:
 	mkdir -p $(INSTALL)
-	cp bazel-bin/dotm.pex $(INSTALL)/dotm
+	if [ -f $(INSTALL)/dotm ]; then \
+		rm -f $(INSTALL)/dotm; \
+	fi
+	cp -au bazel-bin/dotm.pex $(INSTALL)/dotm
 	chmod +rwx $(INSTALL)/dotm
