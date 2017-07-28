@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import sys
 
 from .. import profiles
 from .. import modules
@@ -16,6 +17,8 @@ def sync(args):
         log.info(" ============= DRY RUN ============= ")
     
     profile = profiles.select()
+    if not profile:
+        sys.exit(1)
 
     # args.depth has default, safe to use
     src_dir = config.dotfiles_dir

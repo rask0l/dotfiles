@@ -1,4 +1,5 @@
 import logging
+import sys
 from .. import profiles
 from .. import modules
 
@@ -11,6 +12,8 @@ def link(args):
         log.info(" ============= DRY RUN ============= ")
 
     profile = profiles.select()
+    if not profile:
+        sys.exit(1)
 
     # for each desired module, create softlink
     mods = profile.modules()
