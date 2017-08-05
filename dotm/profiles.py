@@ -87,5 +87,6 @@ def select():
             return profile
     else:
         print("No profiles passed their test for this environment.")
+        return None
 
 
