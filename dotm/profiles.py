@@ -15,7 +15,7 @@ class ProfileError(util.Error):
         self.message = message
 
 class Profile():
-    """ Profile used for selecting different modules for different 
+    """ Profile used for selecting different modules for different
     environments or computers."""
     def __init__(self, name):
         self.name = name
@@ -30,13 +30,14 @@ class Profile():
             log.debug('Testing Profile: {}, Test Return Code: {}'.format(self.name, executed.returncode))
             return executed.returncode
         else:
-            raise ProfileError("Profile must contain test script")
+            log.debug("Profile {0} does not contain test script".format(self.name))
+            return 1
 
     def modules(self):
         """ Return all modules in this profile. """
         with open(self.config_path, 'r') as f:
             yml = yaml.load(f)
-            try: 
+            try:
                 mods = yml["modules"]
             except KeyError as e:
                 # No modules
@@ -54,23 +55,26 @@ class Profile():
             module.unlink()
 
     def _get_links(self):
-        """ Profiles can have files and links embedded in them.  This allows for overriding or profile specific 
+        """ Profiles can have files and links embedded in them.  This allows for overriding or profile specific
         without creating an additional module. """
-        with open(self.config_path, 'r') as f:
-            yml = yaml.load(f)
-            try: 
-                links = yml["links"]
-            except KeyError as e:
-                # No links in this profile
-                return []
-            targets = links.keys()
-            return [Link(
-                    _abs(config.dotfiles_dir,"profiles",self.name,t),
-                    _abs(os.path.join(config.home,links[t]))) 
-                for t 
-                in targets]
+        try:
+            with open(self.config_path, 'r') as f:
+                yml = yaml.load(f)
+                try:
+                    links = yml["links"]
+                except KeyError as e:
+                    # No links in this profile
+                    return []
+                targets = links.keys()
+                return [Link(
+                        _abs(config.dotfiles_dir,"profiles",self.name,t),
+                        _abs(os.path.join(config.home,links[t])))
+                    for t
+                    in targets]
+        except (OSError, IOError) as e:
+            log.error("Profile file error: {0}".format(e))
+            return []
 
-        
 
 def avail():
     """ Returns list of available profiles as Profiles() """

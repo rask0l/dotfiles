@@ -6,40 +6,44 @@ load(
     "pex_pytest",
 )
 
+#load(
+#    "//tools/pypi_package.bzl",
+#    "pypi_package",
+#)
+
 pex_binary(
-    name = "dotm",
+    name = "dotm_pex",
     main = "dotm.py",
+    deps = [
+        "//dotm:dotm"
+    ],
     srcs = [
         "dotm.py",
-        "dotm/config.py",
-        "dotm/__main__.py",
-        "dotm/cmd/unlink.py",
-        "dotm/cmd/link.py",
-        "dotm/cmd/__init__.py",
-        "dotm/cmd/sync.py",
-        "dotm/thirdparty/yaml/cyaml.py",
-        "dotm/thirdparty/yaml/events.py",
-        "dotm/thirdparty/yaml/emitter.py",
-        "dotm/thirdparty/yaml/composer.py",
-        "dotm/thirdparty/yaml/reader.py",
-        "dotm/thirdparty/yaml/representer.py",
-        "dotm/thirdparty/yaml/error.py",
-        "dotm/thirdparty/yaml/serializer.py",
-        "dotm/thirdparty/yaml/constructor.py",
-        "dotm/thirdparty/yaml/dumper.py",
-        "dotm/thirdparty/yaml/loader.py",
-        "dotm/thirdparty/yaml/nodes.py",
-        "dotm/thirdparty/yaml/__init__.py",
-        "dotm/thirdparty/yaml/resolver.py",
-        "dotm/thirdparty/yaml/tokens.py",
-        "dotm/thirdparty/yaml/parser.py",
-        "dotm/thirdparty/yaml/scanner.py",
-        "dotm/thirdparty/__init__.py",
-        "dotm/util.py",
-        "dotm/__init__.py",
-        "dotm/profiles.py",
-        "dotm/modules.py",
     ],
     interpreter = "python3",
 )
 
+#pypi_package(
+#    name = "dotm_pkg",
+#    version = "1.0.0",
+#    description = "Dotfiles manager for python3",
+#    long_description = "README.md",
+#    classifiers = [
+#        "Development Status :: 4 - Beta",
+#        "Environment :: Console",
+#        "Intended Audience :: Developers",
+#        "License :: OSI Approved :: MIT License",
+#        "Operating System :: POSIX",
+#        "Programming Language :: Python :: 3",
+#        "Programming Language :: Python :: 3.6",
+#        "Topic :: Software Development :: Libraries :: Python Modules"
+#    ],
+#    keywords = "dotfiles",
+#    url = "https://github.com/nckturner/dotm",
+#    author = "Nick Turner",
+#    author_email = "nturner4@gmail.com",
+#    license = "MIT",
+#    packages = [":dotm"],
+#    test_suite = "nose.collector",
+#    tests_require = ["nose"],
+#)
