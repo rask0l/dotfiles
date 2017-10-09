@@ -130,4 +130,4 @@ if [ -d $HOME/.config/rc.d ]; then
 fi
 ```
 
-For any shell configuration, I create symlinks pointing to module files inside `~/.config/rc.d/` or `~/.config/zshrc.d/` and my zshrc file will pick it up.  This allows me to keep, for example, ruby shell configuration in my ruby module (~/.dotfiles/modules/ruby/ruby.zsh), and go shell configuration in my go module (~/.dotfiles/modules/go/go.zsh), rather than putting everything in my .zshrc file which would defeat the whole purpose of this module system.  The same concept could be followed with `.bashrc` or `.profile`.
+For any shell configuration, I create symlinks pointing to module files inside `~/.config/rc.d/` or `~/.config/zshrc.d/` and my zshrc file will pick it up.  This allows me to keep, for example, ruby shell configuration in my ruby module (`~/.dotfiles/modules/ruby/ruby.zsh`), and go shell configuration in my go module (`~/.dotfiles/modules/go/go.zsh`), rather than putting everything in my .zshrc file which would defeat the whole purpose of this module system.  The same concept could be followed with `.bashrc` or `.profile`.
